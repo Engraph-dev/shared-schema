@@ -50,17 +50,28 @@ model UserVerificationToken {
 }
 
 model Session {
-  sessionId             String     @id @default(cuid())
+  sessionId             String           @id @default(cuid())
   sessionToken          String
   sessionIp             String
   sessionUA             String
   sessionStartTimestamp DateTime
   sessionEndTimestamp   DateTime
   userId                String
-  sessionUser           User       @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  sessionUser           User             @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   orgId                 String
-  sessionOrg            Org        @relation(fields: [orgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  sessionOrg            Org              @relation(fields: [orgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
   sessionEvents         EventLog[]
+  sessionXSRFTokens     CrossSiteToken[]
+}
+
+model CrossSiteToken {
+  tokenId              String   @id @default(cuid())
+  tokenHash            String
+  tokenExpiryTimestamp DateTime
+  tokenIp              String
+  tokenUA              String
+  tokenSessionId       String?
+  tokenSession         Session? @relation(fields: [tokenSessionId], references: [sessionId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Team {
