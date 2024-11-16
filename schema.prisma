@@ -72,6 +72,8 @@ model CrossSiteToken {
   tokenUA              String
   tokenSessionId       String?
   tokenSession         Session? @relation(fields: [tokenSessionId], references: [sessionId], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([tokenHash], type: Hash)
 }
 
 model Team {
