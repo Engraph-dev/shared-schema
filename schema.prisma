@@ -9,18 +9,21 @@ datasource db {
 }
 
 enum OrgPlan {
-  Hobby
-  Pro
+  None
+  Starter
+  Team
+  Professional
   Enterprise
 }
 
 model Org {
   orgId       String     @id
   orgName     String
-  orgPlan     OrgPlan
+  orgPlan     OrgPlan    @default(Starter)
   orgUsers    User[]
   orgSessions Session[]
   orgEvents   EventLog[]
+  Project     Project[]
 }
 
 enum UserRole {
@@ -106,10 +109,12 @@ enum ProjectSourceType {
 model Project {
   projectId         String              @id @default(cuid())
   projectName       String
+  projectOrgId      String
   projectSourceType ProjectSourceType
-  projectSourceUrl  String?
+  projectSourceUrl  String
   projectTeams      ProjectTeamAccess[]
   projectUsers      ProjectUserAccess[]
+  projectOrg        Org                 @relation(fields: [projectOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum AccessLevel {
@@ -121,8 +126,9 @@ enum AccessLevel {
 model ProjectTeamAccess {
   projectId     String
   teamId        String
-  linkedProject Project @relation(fields: [projectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
-  linkedTeam    Team    @relation(fields: [teamId], references: [teamId], onDelete: Cascade, onUpdate: Cascade)
+  accessLevel   AccessLevel
+  linkedProject Project     @relation(fields: [projectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
+  linkedTeam    Team        @relation(fields: [teamId], references: [teamId], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([projectId, teamId])
 }
@@ -130,8 +136,9 @@ model ProjectTeamAccess {
 model ProjectUserAccess {
   projectId     String
   userId        String
-  linkedProject Project @relation(fields: [projectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
-  linkedUser    User    @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  accessLevel   AccessLevel
+  linkedProject Project     @relation(fields: [projectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
+  linkedUser    User        @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([projectId, userId])
 }
