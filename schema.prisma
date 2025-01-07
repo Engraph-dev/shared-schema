@@ -102,16 +102,22 @@ model UserTeams {
   @@id([userId, teamId])
 }
 
+enum ProjectType {
+  typescript
+}
+
 enum ProjectSourceType {
   GitHub
 }
 
 model Project {
   projectId         String              @id @default(cuid())
+  // The project identifier on the VCS Platform (e.g GitHub: repo id)
+  projectIdentifier String
   projectName       String
   projectOrgId      String
+  projectType       ProjectType
   projectSourceType ProjectSourceType
-  projectSourceUrl  String
   projectTeams      ProjectTeamAccess[]
   projectUsers      ProjectUserAccess[]
   projectOrg        Org                 @relation(fields: [projectOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
