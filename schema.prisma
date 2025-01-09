@@ -17,24 +17,25 @@ enum OrgPlan {
 }
 
 model Org {
-  orgId       String     @id
-  orgName     String
-  orgPlan     OrgPlan    @default(Starter)
-  orgUsers    User[]
-  orgSessions Session[]
-  orgEvents   EventLog[]
-  Project     Project[]
+  orgId        String     @id
+  orgName      String
+  orgPlan      OrgPlan    @default(Starter)
+  orgUsers     User[]
+  orgSessions  Session[]
+  orgEvents    EventLog[]
+  orgProjects  Project[]
+  orgWorkflows Workflow[]
 }
 
 enum UserRole {
   Owner // Can add / manage administrators and below
   Admin // Can add / manage devs and viewer
-  Developer // Read + Write Access
+  Developer // Read + Write Access, Can Trigger Workflows
   Viewer // Read Access Only
 }
 
 model User {
-  userId                 String                  @id @default(cuid())
+  userId                 String                  @id @default(cuid(2))
   userFirstName          String
   userMail               String
   userPassword           String
@@ -52,7 +53,7 @@ model User {
 }
 
 model UserVerificationToken {
-  tokenId                  String   @id @default(cuid())
+  tokenId                  String   @id @default(cuid(2))
   verificationToken        String
   tokenExpirationTimestamp DateTime
   userId                   String
@@ -60,7 +61,7 @@ model UserVerificationToken {
 }
 
 model Session {
-  sessionId             String           @id @default(cuid())
+  sessionId             String           @id @default(cuid(2))
   sessionToken          String
   sessionIp             String
   sessionUA             String
@@ -75,7 +76,7 @@ model Session {
 }
 
 model CrossSiteToken {
-  tokenId              String   @id @default(cuid())
+  tokenId              String   @id @default(cuid(2))
   tokenHash            String
   tokenExpiryTimestamp DateTime
   tokenIp              String
@@ -87,7 +88,7 @@ model CrossSiteToken {
 }
 
 model Team {
-  teamId       String              @id @default(cuid())
+  teamId       String              @id @default(cuid(2))
   teamName     String
   teamUsers    UserTeams[]
   teamProjects ProjectTeamAccess[]
@@ -111,7 +112,7 @@ enum ProjectSourceType {
 }
 
 model Project {
-  projectId         String              @id @default(cuid())
+  projectId         String              @id @default(cuid(2))
   // The project identifier on the VCS Platform (e.g GitHub: repo id)
   projectIdentifier String
   projectName       String
@@ -121,12 +122,13 @@ model Project {
   projectTeams      ProjectTeamAccess[]
   projectUsers      ProjectUserAccess[]
   projectOrg        Org                 @relation(fields: [projectOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  projectWorkflows  Workflow[]
 }
 
 enum AccessLevel {
   Admin // Manage project settings
-  Write // Read + Write
-  Read // Read-only
+  Write // Read + Write, trigger workflows
+  Read // Read-only, cannot trigger workflows
 }
 
 model ProjectTeamAccess {
@@ -149,6 +151,35 @@ model ProjectUserAccess {
   @@id([projectId, userId])
 }
 
+enum WorkflowStatus {
+  Queued
+  CloneStarted
+  CloneFailed
+  CloneCompleted
+  DepGraphStarted
+  DepGraphFailed
+  DepGraphCompleted
+  SummaryGenStarted
+  SummaryGenFailed
+  SummaryGenCompleted
+  SummaryUploadStarted
+  SummaryUploadFailed
+  SummaryUploadCompleted
+  WorkflowCompleted
+}
+
+model Workflow {
+  workflowId             String         @id @default(cuid(2))
+  workflowStartTimestamp DateTime
+  workflowEndTimestamp   DateTime?
+  workflowStatus         WorkflowStatus
+  workflowProjectId      String
+  workflowOrgId          String
+  workflowMetadata       Json
+  workflowProject        Project        @relation(fields: [workflowProjectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
+  workflowOrg            Org            @relation(fields: [workflowOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+}
+
 enum S3RequestMethod {
   GET
   PUT
@@ -162,7 +193,7 @@ enum S3RequestStatus {
 }
 
 model S3Request {
-  requestId                String          @id @default(cuid())
+  requestId                String          @id @default(cuid(2))
   requestObjectKey         String
   requestStatus            S3RequestStatus
   requestCreationTimestamp DateTime
@@ -207,7 +238,7 @@ enum EventType {
 }
 
 model EventLog {
-  eventId        String    @id @default(cuid())
+  eventId        String    @id @default(cuid(2))
   eventTimestamp DateTime
   eventType      EventType
   userId         String?
