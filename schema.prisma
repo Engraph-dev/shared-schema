@@ -116,6 +116,7 @@ model Project {
   // The project identifier on the VCS Platform (e.g GitHub: repo id)
   projectIdentifier String
   projectBranch     String
+  projectEntryPoint String
   projectName       String
   projectOrgId      String
   projectType       ProjectType
