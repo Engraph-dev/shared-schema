@@ -25,6 +25,7 @@ model Org {
   orgEvents    EventLog[]
   orgProjects  Project[]
   orgWorkflows Workflow[]
+  orgTeams     Team[]
 }
 
 enum UserRole {
@@ -90,6 +91,8 @@ model CrossSiteToken {
 model Team {
   teamId       String              @id @default(cuid(2))
   teamName     String
+  teamOrgId    String
+  teamOrg      Org                 @relation(fields: [teamOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
   teamUsers    UserTeams[]
   teamProjects ProjectTeamAccess[]
 }
