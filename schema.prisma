@@ -227,6 +227,8 @@ enum EventType {
   ProjectCreate
   ProjectUpdate
   ProjectDelete
+  ProjectTeamUpdate
+  ProjectUserUpdate
   TeamCreate
   TeamUpdate
   TeamDelete
