@@ -230,6 +230,8 @@ enum EventType {
   TeamCreate
   TeamUpdate
   TeamDelete
+  TeamUserAdd
+  TeamUserDelete
   SessionStart
   SessionClose
   S3RequestCreate
