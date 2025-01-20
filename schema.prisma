@@ -25,6 +25,7 @@ model Org {
   orgEvents    EventLog[]
   orgProjects  Project[]
   orgWorkflows Workflow[]
+  orgTeams     Team[]
 }
 
 enum UserRole {
@@ -90,6 +91,8 @@ model CrossSiteToken {
 model Team {
   teamId       String              @id @default(cuid(2))
   teamName     String
+  teamOrgId    String
+  teamOrg      Org                 @relation(fields: [teamOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
   teamUsers    UserTeams[]
   teamProjects ProjectTeamAccess[]
 }
@@ -161,12 +164,9 @@ enum WorkflowStatus {
   DepGraphStarted
   DepGraphFailed
   DepGraphCompleted
-  SummaryGenStarted
-  SummaryGenFailed
-  SummaryGenCompleted
-  SummaryUploadStarted
-  SummaryUploadFailed
-  SummaryUploadCompleted
+  DepGraphUploadStarted
+  DepGraphUploadFailed
+  DepGraphUploadCompleted
   WorkflowCompleted
 }
 
@@ -227,9 +227,13 @@ enum EventType {
   ProjectCreate
   ProjectUpdate
   ProjectDelete
+  ProjectTeamUpdate
+  ProjectUserUpdate
   TeamCreate
   TeamUpdate
   TeamDelete
+  TeamUserAdd
+  TeamUserDelete
   SessionStart
   SessionClose
   S3RequestCreate
