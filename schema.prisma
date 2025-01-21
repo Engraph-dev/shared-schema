@@ -51,6 +51,7 @@ model User {
   userS3Requests         S3Request[]
   userEvents             EventLog[]
   userVerificationTokens UserVerificationToken[]
+  userWorkflowMessages   WorkflowMessage[]
 }
 
 model UserVerificationToken {
@@ -173,15 +174,33 @@ enum WorkflowStatus {
 }
 
 model Workflow {
-  workflowId             String         @id @default(cuid(2))
+  workflowId             String            @id @default(cuid(2))
   workflowStartTimestamp DateTime
   workflowEndTimestamp   DateTime?
   workflowStatus         WorkflowStatus
   workflowProjectId      String
   workflowOrgId          String
   workflowMetadata       Json
-  workflowProject        Project        @relation(fields: [workflowProjectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
-  workflowOrg            Org            @relation(fields: [workflowOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  workflowProject        Project           @relation(fields: [workflowProjectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
+  workflowOrg            Org               @relation(fields: [workflowOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  workflowMessages       WorkflowMessage[]
+}
+
+enum WorkflowMessageSender {
+  User
+  Assistant
+}
+
+model WorkflowMessage {
+  messageId         String                @id @default(cuid(2))
+  messageContent    String
+  messageTimestamp  DateTime
+  messageSender     WorkflowMessageSender
+  messageIndex      Int                   @default(autoincrement())
+  messageUserId     String
+  messageWorkflowId String
+  messageUser       User                  @relation(fields: [messageUserId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  messageWorkflow   Workflow              @relation(fields: [messageWorkflowId], references: [workflowId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum S3RequestMethod {
