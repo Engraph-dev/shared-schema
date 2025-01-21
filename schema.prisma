@@ -51,6 +51,7 @@ model User {
   userS3Requests         S3Request[]
   userEvents             EventLog[]
   userVerificationTokens UserVerificationToken[]
+  userWorkflowMessages   WorkflowMessage[]
 }
 
 model UserVerificationToken {
@@ -196,7 +197,9 @@ model WorkflowMessage {
   messageTimestamp  DateTime
   messageSender     WorkflowMessageSender
   messageIndex      Int                   @default(autoincrement())
+  messageUserId     String
   messageWorkflowId String
+  messageUser       User                  @relation(fields: [messageUserId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
   messageWorkflow   Workflow              @relation(fields: [messageWorkflowId], references: [workflowId], onDelete: Cascade, onUpdate: Cascade)
 }
 
