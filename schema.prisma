@@ -164,9 +164,12 @@ enum WorkflowStatus {
   DepGraphStarted
   DepGraphFailed
   DepGraphCompleted
-  DepGraphUploadStarted
-  DepGraphUploadFailed
-  DepGraphUploadCompleted
+  EmbedGenStarted
+  EmbedGenFailed
+  EmbedGenCompleted
+  GraphUploadStarted
+  GraphUploadFailed
+  GraphUploadCompleted
   WorkflowCompleted
 }
 
