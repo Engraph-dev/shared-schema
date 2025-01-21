@@ -164,13 +164,12 @@ enum WorkflowStatus {
   DepGraphStarted
   DepGraphFailed
   DepGraphCompleted
-  EmbedGenStarted
-  EmbedGenFailed
-  EmbedGenCompleted
   GraphUploadStarted
   GraphUploadFailed
   GraphUploadCompleted
   WorkflowCompleted
+  // Once a workflow is completed, archive it.
+  Archived
 }
 
 model Workflow {
