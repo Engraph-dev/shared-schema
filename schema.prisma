@@ -171,6 +171,8 @@ enum WorkflowStatus {
   GraphUploadFailed
   GraphUploadCompleted
   WorkflowCompleted
+  // Once a workflow is completed, archive it.
+  Archived
 }
 
 model Workflow {
