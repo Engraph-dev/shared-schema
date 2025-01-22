@@ -188,11 +188,13 @@ model Workflow {
 
 enum WorkflowMessageSender {
   User
-  Assistant
+  QueryAgent
+  AnswerAgent
 }
 
 model WorkflowMessage {
   messageId         String                @id @default(cuid(2))
+  messageGroupId    String
   messageContent    String
   messageTimestamp  DateTime
   messageSender     WorkflowMessageSender
