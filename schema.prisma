@@ -281,3 +281,27 @@ model EventLog {
 
   @@index([userId])
 }
+
+model EvalSummary {
+  summaryId             String                  @id
+  summaryTimestamp      DateTime
+  summaryPlain          String
+  summaryContext        String
+  summaryProject        String
+  summarySource         String
+  summaryType           ProjectType
+  EvalSummaryPreference EvalSummaryPreference[]
+}
+
+model EvalSummaryPreference {
+  preferenceId        String         @id
+  preferenceTimestamp DateTime
+  preferenceType      PreferenceType
+  preferenceSummaryId String
+  EvalSummary         EvalSummary    @relation(fields: [preferenceSummaryId], references: [summaryId], onDelete: Cascade)
+}
+
+enum PreferenceType {
+  Context
+  Plain
+}
