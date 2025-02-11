@@ -25,6 +25,7 @@ model Org {
   orgEvents    EventLog[]
   orgProjects  Project[]
   orgWorkflows Workflow[]
+  orgTeams     Team[]
 }
 
 enum UserRole {
@@ -50,6 +51,7 @@ model User {
   userS3Requests         S3Request[]
   userEvents             EventLog[]
   userVerificationTokens UserVerificationToken[]
+  userWorkflowMessages   WorkflowMessage[]
 }
 
 model UserVerificationToken {
@@ -90,6 +92,8 @@ model CrossSiteToken {
 model Team {
   teamId       String              @id @default(cuid(2))
   teamName     String
+  teamOrgId    String
+  teamOrg      Org                 @relation(fields: [teamOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
   teamUsers    UserTeams[]
   teamProjects ProjectTeamAccess[]
 }
@@ -161,25 +165,44 @@ enum WorkflowStatus {
   DepGraphStarted
   DepGraphFailed
   DepGraphCompleted
-  SummaryGenStarted
-  SummaryGenFailed
-  SummaryGenCompleted
-  SummaryUploadStarted
-  SummaryUploadFailed
-  SummaryUploadCompleted
+  GraphUploadStarted
+  GraphUploadFailed
+  GraphUploadCompleted
   WorkflowCompleted
+  // Once a workflow is completed, archive it.
+  Archived
 }
 
 model Workflow {
-  workflowId             String         @id @default(cuid(2))
+  workflowId             String            @id @default(cuid(2))
   workflowStartTimestamp DateTime
   workflowEndTimestamp   DateTime?
   workflowStatus         WorkflowStatus
   workflowProjectId      String
   workflowOrgId          String
   workflowMetadata       Json
-  workflowProject        Project        @relation(fields: [workflowProjectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
-  workflowOrg            Org            @relation(fields: [workflowOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  workflowProject        Project           @relation(fields: [workflowProjectId], references: [projectId], onDelete: Cascade, onUpdate: Cascade)
+  workflowOrg            Org               @relation(fields: [workflowOrgId], references: [orgId], onDelete: Cascade, onUpdate: Cascade)
+  workflowMessages       WorkflowMessage[]
+}
+
+enum WorkflowMessageSender {
+  User
+  QueryAgent
+  AnswerAgent
+}
+
+model WorkflowMessage {
+  messageId         String                @id @default(cuid(2))
+  messageGroupId    String
+  messageContent    String
+  messageTimestamp  DateTime
+  messageSender     WorkflowMessageSender
+  messageIndex      Int                   @default(autoincrement())
+  messageUserId     String
+  messageWorkflowId String
+  messageUser       User                  @relation(fields: [messageUserId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  messageWorkflow   Workflow              @relation(fields: [messageWorkflowId], references: [workflowId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum S3RequestMethod {
@@ -227,9 +250,13 @@ enum EventType {
   ProjectCreate
   ProjectUpdate
   ProjectDelete
+  ProjectTeamUpdate
+  ProjectUserUpdate
   TeamCreate
   TeamUpdate
   TeamDelete
+  TeamUserAdd
+  TeamUserDelete
   SessionStart
   SessionClose
   S3RequestCreate
