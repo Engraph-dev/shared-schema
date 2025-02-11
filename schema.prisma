@@ -283,7 +283,7 @@ model EventLog {
 }
 
 model EvalSummary {
-  summaryId             String                  @id
+  summaryId             String                  @id @default(cuid(2))
   summaryTimestamp      DateTime
   summaryPlain          String
   summaryContext        String
@@ -294,7 +294,7 @@ model EvalSummary {
 }
 
 model EvalSummaryPreference {
-  preferenceId        String         @id
+  preferenceId        String         @id @default(cuid(2))
   preferenceTimestamp DateTime
   preferenceType      PreferenceType
   preferenceSummaryId String
