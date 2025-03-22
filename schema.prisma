@@ -189,6 +189,7 @@ model Workflow {
 enum WorkflowMessageSender {
   User
   QueryAgent
+  ContextAgent
   AnswerAgent
 }
 
